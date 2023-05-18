@@ -1,0 +1,36 @@
+@url = http://localhost:4800
+
+###
+POST {{url}}/posts
+Content-Type: application/json
+
+{
+    "author_id": 3,
+    "from_loc": "Xorazm Urganch",
+    "to_loc": "Sirdaryo Mirobod",
+    "go_time": "12.03.2023 12:00",
+    "count": 3,
+    "addition": ""
+}
+
+###
+GET {{url}}/posts+-
+
+###
+
+GET {{url}}/users
+
+###
+
+POST {{url}}/users/login
+Content-Type: application/json
+
+{
+    "phone": "915789232",
+    "passwor": "s1234"
+}
+
+###
+
+GET {{url}}/users/verify
+X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IlNhYWQiLCJwaG9uZSI6IjkxNTc4OTIzMiIsInJvbGUiOiJkcml2ZXIiLCJjYXJfaWQiOjEsImNhcl9udW1iZXIiOiIyMzIzMnNkIiwiY2FyX21vZGVsIjoiZGFtYXMiLCJpYXQiOjE2ODA2OTQ3ODksImV4cCI6MTY4MTI5OTU4OX0.EYk_ugIe2GzoPsa_YYOURdP8R-oaIGvUbjbK0UHkBoM

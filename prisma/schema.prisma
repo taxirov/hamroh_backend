@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Region {
+  id        Int        @id
+  name_uz   String
+  name_oz   String
+  name_ru   String
+  districts District[]
+}
+
+model Village {
+  id          Int      @id
+  district_id Int
+  district    District @relation(fields: [district_id], references: [id])
+  name_uz     String
+  name_oz     String
+  name_ru     String
+}
+
+model District {
+  id        Int       @id
+  region_id Int
+  region    Region    @relation(fields: [region_id], references: [id])
+  villages  Village[]
+  name_uz   String
+  name_oz   String
+  name_ru   String
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  phone    String @unique
+  password String
+  role     String
+  car      Car?
+  posts    Post[]
+}
+
+model Car {
+  id        Int    @id @default(autoincrement())
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int    @unique
+  carNumber String @unique
+  carType   String
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  author      User     @relation(fields: [author_id], references: [id])
+  author_id   Int
+  from_loc    String
+  to_loc      String
+  go_time     String
+  count       Int
+  addition    String
+  posted_time DateTime @default(now())
+  status      Boolean  @default(true)
+}
