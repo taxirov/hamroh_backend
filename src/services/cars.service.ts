@@ -1,4 +1,4 @@
-import prisma from "../database";
+import prisma from "../prisma";
 
 export default class Car {
 

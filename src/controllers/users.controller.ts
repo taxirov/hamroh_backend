@@ -7,11 +7,6 @@ import jwt from 'jsonwebtoken'
 const user = new User()
 const car = new Car()
 
-enum Role {
-    passager,
-    driver
-}
-
 export async function getVerify(req: Request, res: Response) {
     res.status(200).json({
         message: "All good",
@@ -82,7 +77,7 @@ export async function loginUser(req: Request, res: Response) {
     const user_exsist = await user.findByPhone(body.phone)
     if(!user_exsist) {
         res.status(404).json({
-            message: "User not found " + body.phone
+            message: "User not found by phone " + body.phone
         })
     }else{
         if(body.password === user_exsist.password){

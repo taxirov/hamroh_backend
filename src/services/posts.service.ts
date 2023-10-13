@@ -1,4 +1,4 @@
-import prisma from "../database"
+import prisma from "../prisma"
 
 export default class Post {
     public async create(author_id: number, from_loc: string, to_loc: string, go_time: string, count: number, addition: string | '') {
@@ -40,6 +40,14 @@ export default class Post {
             where: {
                 from_loc: { startsWith: search },
                 to_loc: { startsWith: search  }
+            }
+        })
+    }
+
+    public async findByUserId(id: number) {
+        return await prisma.post.findMany({
+            where: {
+                author_id: id
             }
         })
     }

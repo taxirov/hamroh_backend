@@ -57,3 +57,11 @@ export async function getPosts(req: Request, res: Response) {
         posts: posts_by_direction
     })
 }
+
+export async function getUserPosts(req: Request, res: Response) {
+    let payload = res.locals.payload
+    res.status(200).json({
+        message: payload.name + " posts",
+        posts: await post.findByUserId(payload.id)
+    })
+}

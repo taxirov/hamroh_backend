@@ -1,37 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextIndex", "postgresqlExtensions", "fullTextSearch"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-model Region {
-  id        Int        @id
-  name_uz   String
-  name_oz   String
-  name_ru   String
-  districts District[]
-}
-
-model Village {
-  id          Int      @id
-  district_id Int
-  district    District @relation(fields: [district_id], references: [id])
-  name_uz     String
-  name_oz     String
-  name_ru     String
-}
-
-model District {
-  id        Int       @id
-  region_id Int
-  region    Region    @relation(fields: [region_id], references: [id])
-  villages  Village[]
-  name_uz   String
-  name_oz   String
-  name_ru   String
+  extensions = [pg_trgm]
 }
 
 model User {
@@ -46,21 +21,24 @@ model User {
 
 model Car {
   id        Int    @id @default(autoincrement())
-  user      User   @relation(fields: [userId], references: [id])
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    Int    @unique
   carNumber String @unique
   carType   String
 }
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  author      User     @relation(fields: [author_id], references: [id])
-  author_id   Int
-  from_loc    String
-  to_loc      String
-  go_time     String
-  count       Int
-  addition    String
-  posted_time DateTime @default(now())
-  status      Boolean  @default(true)
+  id           Int      @id @default(autoincrement())
+  author       User     @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author_id    Int
+  from_loc     String
+  to_loc       String
+  go_time      String
+  count        Int      @default(1)
+  addition     String
+  last_updated DateTime @updatedAt
+  posted_time  DateTime @default(now())
+  status       Boolean  @default(true)
+
+  @@index([go_time, author_id, to_loc, from_loc, addition])
 }

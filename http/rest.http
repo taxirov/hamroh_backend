@@ -1,11 +1,12 @@
-@url = http://localhost:4800
+@url = http://localhost:4849
 
 ###
-POST {{url}}/posts
-Content-Type: application/json
+GET {{url}}/posts/user
+Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6InBhc3NlbmdlciIsImlhdCI6MTY5NzEzNjI3OCwiZXhwIjoxNjk3NzQxMDc4fQ.322lb5JBEV92Mhh9XVX3eUF-TTUlEqLHa1f8UhfImoE
 
+###
 {
-    "author_id": 3,
+    "author_id": 7,
     "from_loc": "Xorazm Urganch",
     "to_loc": "Sirdaryo Mirobod",
     "go_time": "12.03.2023 12:00",
@@ -14,11 +15,26 @@ Content-Type: application/json
 }
 
 ###
-GET {{url}}/posts+-
+GET {{url}}/posts/
 
 ###
 
 GET {{url}}/users
+X-Access-Key: jnalndlanflasn;flrinioe903409hf0
+
+###
+
+POST {{url}}/users/register
+Content-Type: application/json
+
+{
+    "name": "Elyor Javlonov",
+    "phone": "+998901846164",
+    "password": "Saad1234",
+    "role": "passenger",
+    "car_number": "90F902LA",
+    "car_model": "Damas"
+}
 
 ###
 
@@ -26,11 +42,14 @@ POST {{url}}/users/login
 Content-Type: application/json
 
 {
-    "phone": "915789232",
-    "passwor": "s1234"
+    "phone": "+998905789204",
+    "password": "Saad1234"
 }
 
 ###
 
 GET {{url}}/users/verify
-X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwibmFtZSI6IlNhYWQiLCJwaG9uZSI6IjkxNTc4OTIzMiIsInJvbGUiOiJkcml2ZXIiLCJjYXJfaWQiOjEsImNhcl9udW1iZXIiOiIyMzIzMnNkIiwiY2FyX21vZGVsIjoiZGFtYXMiLCJpYXQiOjE2ODA2OTQ3ODksImV4cCI6MTY4MTI5OTU4OX0.EYk_ugIe2GzoPsa_YYOURdP8R-oaIGvUbjbK0UHkBoM
+X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6InBhc3NlbmdlciIsImlhdCI6MTY5Njc2NzA3MSwiZXhwIjoxNjk3MzcxODcxfQ.OGOJk0_6WUXb8oRmRDSMSJgXfmNzahNkR8HKsSVzAyc
+
+###
+

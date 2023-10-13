@@ -1,7 +1,8 @@
 import { Router } from "express"
-import { postPost, getPosts } from "../controllers/posts.controller"
+import { postPost, getPosts, getUserPosts } from "../controllers/posts.controller"
 import { createValidator } from 'express-joi-validation'
 import Joi from 'joi'
+import { checkToken } from "../middlewares/users.middleware"
 
 const router = Router()
 
@@ -24,6 +25,6 @@ const schemaQuery = Joi.object({
 
 router.post('/', validator.body(schemaBody), postPost)
 router.get('/', validator.query(schemaQuery), getPosts)
-
+router.get('/user', checkToken, getUserPosts)
 
 export default router
