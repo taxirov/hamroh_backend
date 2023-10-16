@@ -24,27 +24,37 @@ X-Access-Key: jnalndlanflasn;flrinioe903409hf0
 
 ###
 
-POST {{url}}/users/register
+POST http://31.129.110.72:4849/users/register
 Content-Type: application/json
 
 {
-    "name": "Elyor Javlonov",
-    "phone": "+998901846164",
-    "password": "Saad1234",
-    "role": "passenger",
-    "car_number": "90F902LA",
-    "car_model": "Damas"
+    "name": "Saad Takhir",
+    "phone": "+998905789204",
+    "password": "Saad9204",
+    "role": "passenger"
 }
 
 ###
 
-POST {{url}}/users/login
+
+
+POST http://31.129.110.72:4849/users/login
 Content-Type: application/json
+
 
 {
     "phone": "+998905789204",
-    "password": "Saad1234"
+    "password": "Saad9204"
 }
+###
+
+PM2           | App [hamroh-api:1] exited with code [0] via signal [SIGINT]
+PM2           | App [hamroh-api:1] starting in -fork mode-
+PM2           | App [hamroh-api:1] online
+1|hamroh-api  | src/server.ts(10,13): error TS2349: This expression is not callable.
+1|hamroh-api  |   Type 'typeof e' has no call signatures.
+1|hamroh-api  | src/server.ts(12,9): error TS2349: This expression is not callable.
+1|hamroh-api  |   Type '{ default: <T extends CorsRequest = CorsRequest>(options?: CorsOptions | CorsOptionsDelegate<T> | undefined) => (req: T, res: { ...; }, next: (err?: any) => any) => void; }' has no call signatures."
 
 ###
 
@@ -53,3 +63,10 @@ X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGF
 
 ###
 
+| App [hamroh-api:1] exited with code [0] via signal [SIGINT]
+PM2           | App [hamroh-api:1] starting in -fork mode-
+PM2           | App [hamroh-api:1] online
+1|hamroh-api  | src/server.ts(10,13): error TS2349: This expression is not callable.
+1|hamroh-api  |   Type 'typeof e' has no call signatures.
+1|hamroh-api  | src/server.ts(12,9): error TS2349: This expression is not callable.
+1|hamroh-api  |   Type '{ default: <T extends CorsRequest = CorsRequest>(options?: CorsOptions | CorsOptionsDelegate<T> | undefined) => (req: T, res: { ...; }, next: (err?: any) => any) => void; }' has no call signatures.

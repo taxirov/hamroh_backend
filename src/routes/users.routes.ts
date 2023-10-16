@@ -1,7 +1,7 @@
-import { Router } from "express"
+import { Router } from 'express'
 import { getUsers, registerUser, loginUser, getVerify } from "../controllers/users.controller"
 import { createValidator } from 'express-joi-validation'
-import Joi from 'joi'
+import  Joi from 'joi'
 import { checkToken } from "../middlewares/users.middleware"
 
 const router = Router()

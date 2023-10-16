@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router }  from "express"
 import { postPost, getPosts, getUserPosts } from "../controllers/posts.controller"
 import { createValidator } from 'express-joi-validation'
 import Joi from 'joi'
