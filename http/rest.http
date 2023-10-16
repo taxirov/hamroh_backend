@@ -5,13 +5,16 @@ GET {{url}}/posts/user
 Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6InBhc3NlbmdlciIsImlhdCI6MTY5NzEzNjI3OCwiZXhwIjoxNjk3NzQxMDc4fQ.322lb5JBEV92Mhh9XVX3eUF-TTUlEqLHa1f8UhfImoE
 
 ###
+POST http://31.129.110.72:4849/posts
+Content-Type: application/json
+
 {
-    "author_id": 7,
+    "author_id": 1,
     "from_loc": "Xorazm Urganch",
     "to_loc": "Sirdaryo Mirobod",
     "go_time": "12.03.2023 12:00",
     "count": 3,
-    "addition": ""
+    "addition": "Hello World"
 }
 
 ###
@@ -38,9 +41,8 @@ Content-Type: application/json
 
 
 
-POST http://31.129.110.72:4849/users/login
+POST http://31.129.110.72:9200/users/login
 Content-Type: application/json
-
 
 {
     "phone": "+998905789204",
@@ -58,8 +60,8 @@ PM2           | App [hamroh-api:1] online
 
 ###
 
-GET {{url}}/users/verify
-X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6InBhc3NlbmdlciIsImlhdCI6MTY5Njc2NzA3MSwiZXhwIjoxNjk3MzcxODcxfQ.OGOJk0_6WUXb8oRmRDSMSJgXfmNzahNkR8HKsSVzAyc
+GET http://31.129.110.72:9200/users/verify
+X-Auth-Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlNhYWQgVGFraGlyIiwicGhvbmUiOiIrOTk4OTA1Nzg5MjA0Iiwicm9sZSI6InBhc3NlbmdlciIsImlhdCI6MTY5NzQ3NDExMywiZXhwIjoxNjk4MDc4OTEzfQ.LbMYHQP1SeJPe6bo977f7VBfLpA_fjVJxmndUzPu5Bw
 
 ###
 
