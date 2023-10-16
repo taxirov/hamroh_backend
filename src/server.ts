@@ -14,8 +14,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // app.use('/reg', locations)
-app.use('/users', usersRoutes)
-app.use('/posts', postsRoutes)
+app.use('/api/user', usersRoutes)
+app.use('/api/post', postsRoutes)
 
 const port = +process.env.PORT! || 3000
 app.listen(port, () => {
