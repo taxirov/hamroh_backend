@@ -1,8 +1,8 @@
 export type PostDto = {
-    author_id: number
-    from_loc: string
-    to_loc: string
-    go_time: string
+    profileId: number
+    fromLocation: string
+    toLocation: string
+    goTime: string
     count: number
-    addition: string | ''
+    addition: string | null
 }
