@@ -1,3 +1,5 @@
+import { $Enums } from "@prisma/client"
+
 export type RegisterDto = {
     name: string
     phone: string
@@ -9,13 +11,11 @@ export type RegisterDto = {
 }
 
 export type LoginDto = {
-    phone: string
+    email: string
     password: string
 }
 
 export type Payload = {
-    id: number
-    phone: string
-    email: string
+    id: number,
     role: string
 }

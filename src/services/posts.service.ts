@@ -1,54 +1,154 @@
+import { Prisma } from "@prisma/client"
 import prisma from "../prisma"
 
-export default class Post {
-    public async create(author_id: number, from_loc: string, to_loc: string, go_time: string, count: number, addition: string | '') {
+const postSelect: Prisma.PostSelect = {
+    id: true,
+    profile: {
+        select: {
+            id: true,
+            userId: true,
+            userName: true,
+            userPhone: true,
+            userEmail: true,
+            userCarNumber: true,
+            userCarType: true
+        }
+    },
+    fromLocation: true,
+    toLocation: true,
+    goTime: true,
+    count: true,
+    addition: true,
+    status: true,
+    createdAt: true,
+    updatedAt: true
+}
+export class PostService {
+    async create(profileId: number, fromLocation: string, toLocation: string, goTime: string, count: number, addition: string | null) {
         return await prisma.post.create({
-            data: { author_id, from_loc, to_loc, go_time, count, addition }
+            data: {
+                profileId,
+                fromLocation,
+                toLocation,
+                goTime,
+                count,
+                addition
+            },
+            select: postSelect
         })
     }
-    
-    public async findAll() {
-        return await prisma.post.findMany()
-    }
-
-    public async findAllActive() {
-        return await prisma.post.findMany({
-            where: { status: true }
+    async update(id: number, fromLocation: string, toLocation: string, goTime: string, count: number, addition: string | null) {
+        return await prisma.post.update({
+            where: { id },
+            data: {
+                fromLocation,
+                toLocation,
+                goTime,
+                count,
+                addition
+            },
+            select: postSelect
         })
     }
-    
-    public async findByFromLoc(from_loc: string) {
+    async delete(id: number) {
+        return await prisma.post.delete({ where: { id }, select: postSelect })
+    }
+    async deleteAll() {
+        return await prisma.post.deleteMany()
+    }
+    async updateStatus(id: number, status: number) {
+        return await prisma.post.update({ where: { id }, data: { status }, select: postSelect })
+    }
+    async findAll(page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.post.findMany({ where: { status: { in: [1, 0] } }, orderBy: { createdAt: 'desc' }, select: postSelect, skip, take })
+    }
+    async CountAll() {
+        return (await prisma.post.findMany({ select: { id: true } })).length
+    }
+    async findAllActive(page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
         return await prisma.post.findMany({
-            where: { from_loc }
+            where: { status: 1 },
+            orderBy: { createdAt: 'desc' },
+            select: postSelect,
+            skip, take
         })
     }
-
-    public async findByToLoc(to_loc: string) {
+    async findByFromLocation(fromLocation: string, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
         return await prisma.post.findMany({
-            where: { to_loc }
+            where: { fromLocation },
+            orderBy: { createdAt: 'desc' },
+            select: postSelect,
+            skip, take
         })
     }
-
-    public async findByDirection(from_loc: string, to_loc: string) {
+    async CountByFromLocation(fromLocation: string) {
+        return (await prisma.post.findMany({
+            where: { fromLocation },
+            select: { id: true },
+        })).length
+    }
+    async findByToLocation(toLocation: string, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
         return await prisma.post.findMany({
-            where: { from_loc, to_loc }
+            where: { toLocation },
+            orderBy: { createdAt: 'desc' },
+            select: postSelect,
+            skip, take
         })
     }
-
-    public async searchPost(search: string) {
+    async CountByToLocation(toLocation: string) {
+        return (await prisma.post.findMany({
+            where: { toLocation },
+            select: { id: true }
+        })).length
+    }
+    async findByDirection(fromLocation: string, toLocation: string, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
         return await prisma.post.findMany({
-            where: {
-                from_loc: { startsWith: search },
-                to_loc: { startsWith: search  }
-            }
+            where: { fromLocation, toLocation },
+            select: postSelect,
+            orderBy: { createdAt: 'desc' },
+            skip, take
         })
     }
-
-    public async findByUserId(id: number) {
+    async CountByDirection(fromLocation: string, toLocation: string) {
+        return (await prisma.post.findMany({
+            where: { fromLocation, toLocation },
+            select: { id: true }
+        })).length
+    }
+    async findByProfileId(profileId: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
         return await prisma.post.findMany({
-            where: {
-                author_id: id
-            }
+            where: { profileId },
+            select: postSelect,
+            orderBy: { createdAt: 'desc' },
+            skip, take
+        })
+    }
+    async findByUserId(userId: number, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.post.findMany({
+            where: { profile: { userId} },
+            select: postSelect,
+            orderBy: { createdAt: 'desc' },
+            skip, take
+        })
+    }
+    async findById(id: number) {
+        return await prisma.post.findUnique({
+            where: { id },
+            select: postSelect
         })
     }
 }

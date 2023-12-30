@@ -1,67 +1,165 @@
 import { Request, Response } from "express";
-import Post from "../services/posts.service";
-import User from "../services/users.service";
-import { PostDto } from "../models/posts.model";
+import { PostService } from "../services/posts.service";
+import { UserService } from "../services/users.service";
+import { PostDto, } from "../models/posts.model";
+import { Payload } from "../models/users.model";
 
-const post = new Post()
-const user = new User()
+const postService = new PostService()
+const userService = new UserService()
 
-export async function postPost(req: Request, res: Response) {
-    const body: PostDto = req.body
-    const author = await user.findById(body.author_id)
-    if(author == null) {
-        return res.status(404).json({
-            message: "User not found by id " + body.author_id
-        })
+export class PostController {
+    async post(req: Request, res: Response) {
+        try {
+            const body: PostDto = req.body
+            const payload = res.locals.payload as Payload
+            console.log(payload)
+            const profile = await userService.findProfileById(payload.id)
+            if (profile != null) {
+                const post_created = await postService.create(profile.id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
+                res.status(201).json({
+                    message: "Post created",
+                    post: post_created
+                })
+            } else {
+                res.status(404).json({
+                    message: "User not found"
+                })
+            }
+        } catch (e) {
+            console.log(e)
+            res.status(500)
+        }
     }
-    const post_created = await post.create(body.author_id, body.from_loc, body.to_loc, body.go_time, body.count, body.addition)
-    res.status(201).json({
-        message: "Post created",
-        post: post_created
-    })
-}
-
-export async function getPosts(req: Request, res: Response) {
-    const { from_loc , to_loc } = req.query
-    if(from_loc === undefined && to_loc === undefined){
-        const posts = await post.findAll()
-        return res.status(200).json({
-            message: "All posts",
-            posts
-        })
+    async put(req: Request, res: Response) {
+        try {
+            const id = req.params.id
+            const body: PostDto = req.body
+            const payload: Payload = res.locals.payload
+            const post_exsist = await postService.findById(+id)
+            if (post_exsist == null) {
+                return res.status(404).json({
+                    message: "Post not found"
+                })
+            } else {
+                if (post_exsist.profile.userId == payload.id) {
+                    const post_updated = await postService.update(+id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
+                    res.status(200).json({
+                        message: "Post created",
+                        post: post_updated
+                    })
+                } else if (post_exsist.profile.userRole == 'admin') {
+                    const post_updated = await postService.update(+id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
+                    res.status(200).json({
+                        message: "Post created",
+                        post: post_updated
+                    })
+                } else {
+                    res.status(403).json({ message: 'You do not own this post' })
+                }
+            }
+        } catch (e) {
+            res.status(500)
+        }
     }
-    if(from_loc === '' && to_loc === ''){
-        const posts = await post.findAll()
-        return res.status(200).json({
-            message: "All posts",
-            posts
-        })
+    async get(req: Request, res: Response) {
+        try {
+            const { current_page, per_page, fromLocation, toLocation } = req.query
+            if (current_page != undefined && per_page != undefined) {
+                if (fromLocation != undefined) {
+                    if (toLocation != undefined) {
+                        let u: number = await postService.CountByDirection(fromLocation.toString(), toLocation.toString())
+                        let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
+                        const posts = await postService.findByDirection(fromLocation.toString(), toLocation.toString(), +current_page, +per_page)
+                        return res.status(200).json({
+                            posts,
+                            current_page,
+                            per_page,
+                            total_page_count: p,
+                            total_post_count: u
+                        })
+                    } else {
+                        let u: number = await postService.CountByFromLocation(fromLocation.toString())
+                        let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
+                        const posts = await postService.findByFromLocation(fromLocation.toString(), +current_page, +per_page)
+                        return res.status(200).json({
+                            posts,
+                            current_page,
+                            per_page,
+                            total_page_count: p,
+                            total_post_count: u
+                        })
+                    }
+                } else if (toLocation != undefined) {
+                    let u: number = await postService.CountByToLocation(toLocation.toString())
+                    let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
+                    const posts = await postService.findByToLocation(toLocation.toString(), +current_page, +per_page)
+                    return res.status(200).json({
+                        posts,
+                        current_page,
+                        per_page,
+                        total_page_count: p,
+                        total_post_count: u
+                    })
+                } else {
+                    let u: number = await postService.CountAll()
+                    let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
+                    const posts = await postService.findAll(+current_page, +per_page)
+                    return res.status(200).json({
+                        posts,
+                        current_page,
+                        per_page,
+                        total_page_count: p,
+                        total_post_count: u
+                    })
+                }
+            }
+        } catch (e) {
+            res.status(500)
+        }
     }
-    if(from_loc === '' && to_loc !== undefined){
-        const posts_by_toloc = await post.findByToLoc(to_loc.toString())
-        return res.status(200).json({
-            message: "All posts to " + to_loc,
-            posts: posts_by_toloc
-        })
+    async getByUser(req: Request, res: Response) {
+        try {
+            const { current_page, per_page } = req.query
+            if (current_page != undefined && per_page != undefined) {
+                let payload: Payload = res.locals.payload
+                const posts = await postService.findByUserId(payload.id, +current_page, +per_page)
+                res.status(200).json({
+                    posts
+                })
+            }
+        } catch (e) {
+            res.status(500)
+        }
     }
-    if(from_loc !== undefined && to_loc === ''){
-        const posts_by_fromloc = await post.findByFromLoc(from_loc.toString())
-        return res.status(200).json({
-            message: "All posts from " + from_loc,
-            posts: posts_by_fromloc
-        })
+    async delete(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+            const payload: Payload = res.locals.payload
+            const post_exsist = await postService.findById(+id)
+            if (post_exsist) {
+                if (post_exsist.profile.userId == payload.id) {
+                    const post_deleted = await postService.delete(post_exsist.id)
+                    res.status(200).json({
+                        post: post_deleted
+                    })
+                } else if (post_exsist.profile.userRole == 'admin') {
+                    const post_deleted = await postService.delete(post_exsist.id)
+                    res.status(200).json({
+                        post: post_deleted
+                    })
+                } else {
+                    res.status(403).json({
+                        message: "You do not own this post"
+                    })
+                }
+            } else {
+                res.status(404).json({
+                    message: "Post not found"
+                })
+            }
+        } catch (e) {
+            res.status(500)
+        }
     }
-    const posts_by_direction = await post.findByDirection(from_loc as string, to_loc as string)
-    res.status(200).json({
-        message: "All posts from " + from_loc + " to " + to_loc,
-        posts: posts_by_direction
-    })
-}
-
-export async function getUserPosts(req: Request, res: Response) {
-    let payload = res.locals.payload
-    res.status(200).json({
-        message: payload.name + " posts",
-        posts: await post.findByUserId(payload.id)
-    })
+    async patchStatus(req: Request, res: Response) { }
 }

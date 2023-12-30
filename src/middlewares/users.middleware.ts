@@ -40,3 +40,27 @@ export async function checkAdmin(req: Request, res: Response, next: NextFunction
         })
     }
 }
+
+export async function checkAdminKey(req: Request, res: Response, next: NextFunction) {
+    try {
+        const admin_key = req.header('Admin-Key')
+        if (admin_key == undefined) {
+            res.status(403).json({
+                message: "Admin key not provided"
+            })
+        } else {
+            if (admin_key == process.env.ADMIN_KEY) {
+                next()
+            } else {
+                res.status(401).json({
+                    message: "Invalid admin key"
+                })
+            }
+        }
+    }
+    catch (err: any) {
+        res.status(500).json({
+            error: 'Internal Server Error'
+        })
+    }
+}

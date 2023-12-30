@@ -1,30 +1,37 @@
 import { Router }  from "express"
-import { postPost, getPosts, getUserPosts } from "../controllers/posts.controller"
+import { PostController } from "../controllers/posts.controller"
 import { createValidator } from 'express-joi-validation'
 import Joi from 'joi'
 import { checkToken } from "../middlewares/users.middleware"
 
 const router = Router()
-
 const validator = createValidator()
+const postController = new PostController()
 
 const schemaBody = Joi.object({
-    author_id: Joi.number().required(),
-    from_loc: Joi.string().required(),
-    to_loc: Joi.string().required(),
-    go_time: Joi.string().required(),
+    fromLocation: Joi.string().required(),
+    toLocation: Joi.string().required(),
+    goTime: Joi.string().required(),
     count: Joi.number().required(),
-    addition: Joi.string().allow('')
+    addition: Joi.string().allow(null)
 })
 
-const schemaQuery = Joi.object({
-    from_loc: Joi.string().allow('', null),
-    to_loc: Joi.string().allow('', null),
-    search: Joi.string().allow('', null)
+const schemaStatusBody = Joi.object({
+    status: Joi.number().required()
 })
 
-router.post('/', validator.body(schemaBody), postPost)
-router.get('/', validator.query(schemaQuery), getPosts)
-router.get('/user', checkToken, getUserPosts)
+const schemaGetQuery = Joi.object({
+    current_page: Joi.number().required(),
+    per_page: Joi.number().required(),
+    fromLocation: Joi.string().allow(null),
+    toLocation: Joi.string().allow(null)
+})
+
+router.post('/', checkToken, validator.body(schemaBody), postController.post)
+router.put('/:id', checkToken, validator.body(schemaBody), postController.put)
+router.get('/', validator.query(schemaGetQuery), postController.get)
+router.get('/profile/:id', checkToken, postController.getByUser)
+router.delete('/:id', checkToken, postController.delete)
+// router.patch('/:id', checkToken, validator.body(schemaUpdateStatusBody, postController.patchStatus))
 
 export default router

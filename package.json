@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "start": "ts-node src/server.ts",
-    "pm2": "tsc && pm2 start pm2.config.js"
+    "start": "ts-node src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +13,7 @@
   "dependencies": {
     "@prisma/client": "^5.7.1",
     "@types/jsonwebtoken": "^9.0.1",
+    "@types/nodemailer": "^6.4.14",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -21,6 +21,7 @@
     "joi": "^17.9.1",
     "jprq": "^0.0.1",
     "jsonwebtoken": "^9.0.0",
+    "nodemailer": "^6.9.7",
     "nodemon": "^3.0.1",
     "query-validation": "^0.3.1"
   },
