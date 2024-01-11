@@ -28,7 +28,9 @@ export class UserService {
                     profile: {
                         create: {
                             userName: dto.name,
-                            userRole: dto.role as Role 
+                            userRole: dto.role as Role,
+                            userCarNumber: dto.carNumber,
+                            userCarType: dto.carType as CarType
                         }
                     }
                 },

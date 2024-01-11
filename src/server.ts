@@ -15,8 +15,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// Read the 'countries.json' file
-const countriesFilePath = path.join(__dirname, 'json', 'countries.json');
+const countriesFilePath = path.join(__dirname, 'json', 'new.json');
 app.get('/api/countries', (req, res) => {
     fs.readFile(countriesFilePath, 'utf8', (err: any, data: string) => {
         if (err) {
@@ -24,7 +23,7 @@ app.get('/api/countries', (req, res) => {
             res.status(500).json({ error: 'Internal Server Error' });
         } else {
             const countries = JSON.parse(data);
-            res.json(countries);
+            res.status(200).json(countries);
         }
     });
 });

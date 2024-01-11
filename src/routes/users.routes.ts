@@ -19,7 +19,7 @@ const schemaRegister = Joi.object({
 })
 
 const schemaLogin = Joi.object({
-    phone: Joi.string().required(),
+    email: Joi.string().required(),
     password: Joi.string().required()
 })
 
@@ -29,13 +29,13 @@ const schemaGet = Joi.object({
 })
 
 
-router.get('/', checkToken, checkAdmin, validator.query(schemaGet), getUsers)
-router.post('/register', validator.body(schemaRegister), registerUser)
-router.post('/login', validator.body(schemaLogin), loginUser)
-router.post('/reset', checkToken, resetUserPassword)
-router.post('/forget', forgetUserPassword)
-router.get('/verify', checkToken, getVerify)
-router.get('/refresh', checkToken, getToken)
-router.patch('/:id/role', checkToken, checkAdminKey, patchUserStatus)
+router.get('/', checkToken, checkAdmin, validator.query(schemaGet), getUsers) // to do
+router.post('/register', validator.body(schemaRegister), registerUser) // done
+router.post('/login', validator.body(schemaLogin), loginUser) //done
+router.post('/reset', checkToken, resetUserPassword) // to do
+router.post('/forget', forgetUserPassword) // to do
+router.get('/verify', checkToken, getVerify) // done
+router.get('/refresh', checkToken, getToken) // to do
+router.patch('/:id/role', checkToken, checkAdminKey, patchUserStatus) // to do
 
 export default router

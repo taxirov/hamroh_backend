@@ -12,7 +12,6 @@ export class PostController {
         try {
             const body: PostDto = req.body
             const payload = res.locals.payload as Payload
-            console.log(payload)
             const profile = await userService.findProfileById(payload.id)
             if (profile != null) {
                 const post_created = await postService.create(profile.id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
@@ -41,13 +40,7 @@ export class PostController {
                     message: "Post not found"
                 })
             } else {
-                if (post_exsist.profile.userId == payload.id) {
-                    const post_updated = await postService.update(+id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
-                    res.status(200).json({
-                        message: "Post created",
-                        post: post_updated
-                    })
-                } else if (post_exsist.profile.userRole == 'admin') {
+                if (post_exsist.profile.userId == payload.id || payload.role == 'admin') {
                     const post_updated = await postService.update(+id, body.fromLocation, body.toLocation, body.goTime, body.count, body.addition)
                     res.status(200).json({
                         message: "Post created",
@@ -58,77 +51,87 @@ export class PostController {
                 }
             }
         } catch (e) {
-            res.status(500)
+            res.status(500).json({ message: 'Internal server error' })
         }
     }
     async get(req: Request, res: Response) {
         try {
-            const { current_page, per_page, fromLocation, toLocation } = req.query
-            if (current_page != undefined && per_page != undefined) {
+            const { current_page, per_page, role, fromLocation, toLocation } = req.query
+            if (current_page != undefined && per_page != undefined && role != undefined) {
                 if (fromLocation != undefined) {
                     if (toLocation != undefined) {
-                        let u: number = await postService.CountByDirection(fromLocation.toString(), toLocation.toString())
+                        let u: number = await postService.CountByDirection(fromLocation.toString(), toLocation.toString(), role.toString())
                         let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
-                        const posts = await postService.findByDirection(fromLocation.toString(), toLocation.toString(), +current_page, +per_page)
+                        const posts = await postService.findByDirection(fromLocation.toString(), toLocation.toString(), role.toString(), +current_page, +per_page)
                         return res.status(200).json({
                             posts,
                             current_page,
                             per_page,
+                            role,
                             total_page_count: p,
                             total_post_count: u
                         })
                     } else {
-                        let u: number = await postService.CountByFromLocation(fromLocation.toString())
+                        let u: number = await postService.CountByFromLocation(fromLocation.toString(), role.toString())
                         let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
-                        const posts = await postService.findByFromLocation(fromLocation.toString(), +current_page, +per_page)
+                        const posts = await postService.findByFromLocation(fromLocation.toString(), role.toString(), +current_page, +per_page)
                         return res.status(200).json({
                             posts,
                             current_page,
                             per_page,
+                            role,
                             total_page_count: p,
                             total_post_count: u
                         })
                     }
                 } else if (toLocation != undefined) {
-                    let u: number = await postService.CountByToLocation(toLocation.toString())
+                    let u: number = await postService.CountByToLocation(toLocation.toString(), role.toString())
                     let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
-                    const posts = await postService.findByToLocation(toLocation.toString(), +current_page, +per_page)
+                    const posts = await postService.findByToLocation(toLocation.toString(), role.toString(), +current_page, +per_page)
                     return res.status(200).json({
                         posts,
                         current_page,
                         per_page,
+                        role,
                         total_page_count: p,
                         total_post_count: u
                     })
                 } else {
-                    let u: number = await postService.CountAll()
+                    let u: number = await postService.CountAllByRole(role.toString())
                     let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
-                    const posts = await postService.findAll(+current_page, +per_page)
+                    const posts = await postService.findAllByRole(role.toString(), +current_page, +per_page)
                     return res.status(200).json({
                         posts,
                         current_page,
                         per_page,
+                        role,
                         total_page_count: p,
                         total_post_count: u
                     })
                 }
             }
         } catch (e) {
-            res.status(500)
+            res.status(500).json({ message: "Internal server error" })
         }
     }
     async getByUser(req: Request, res: Response) {
         try {
-            const { current_page, per_page } = req.query
-            if (current_page != undefined && per_page != undefined) {
+            const { current_page, per_page, status } = req.query
+            if (current_page != undefined && per_page != undefined && status != undefined) {
                 let payload: Payload = res.locals.payload
-                const posts = await postService.findByUserId(payload.id, +current_page, +per_page)
+                let u: number = await postService.countByUserId(payload.id, +status)
+                let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
+                const posts = await postService.findByUserId(payload.id, +status, +current_page, +per_page)
                 res.status(200).json({
-                    posts
+                    posts,
+                    current_page,
+                    per_page,
+                    total_page_count: p,
+                    total_post_count: u
                 })
             }
         } catch (e) {
-            res.status(500)
+            res.status(500).json({ message: "Internal server error", error: e })
         }
     }
     async delete(req: Request, res: Response) {
@@ -161,5 +164,25 @@ export class PostController {
             res.status(500)
         }
     }
-    async patchStatus(req: Request, res: Response) { }
+    async patchStatus(req: Request, res: Response) {
+        try {
+            const payload: Payload = res.locals.payload
+            const { status } = req.body
+            const { id } = req.params
+            const post_exsist = await postService.findById(+id)
+            if (post_exsist != null) {
+                if (post_exsist.profile.userId == payload.id || payload.role == 'admin') {
+                    const post_updated = await postService.updateStatus(+id, +status)
+                    res.status(200).json({
+                        post: post_updated
+                    })
+                } else {
+                    res.status(403).json({ message: "You do not own this post" })
+                }
+            } else {}
+
+        } catch (e) {
+            res.status(500).json({ message: "Internal server error" })
+        }
+    }
 }

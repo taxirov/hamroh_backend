@@ -23,6 +23,7 @@ const schemaStatusBody = Joi.object({
 const schemaGetQuery = Joi.object({
     current_page: Joi.number().required(),
     per_page: Joi.number().required(),
+    role: Joi.string().required(),
     fromLocation: Joi.string().allow(null),
     toLocation: Joi.string().allow(null)
 })
@@ -30,8 +31,8 @@ const schemaGetQuery = Joi.object({
 router.post('/', checkToken, validator.body(schemaBody), postController.post)
 router.put('/:id', checkToken, validator.body(schemaBody), postController.put)
 router.get('/', validator.query(schemaGetQuery), postController.get)
-router.get('/profile/:id', checkToken, postController.getByUser)
+router.get('/profile', checkToken, postController.getByUser)
 router.delete('/:id', checkToken, postController.delete)
-// router.patch('/:id', checkToken, validator.body(schemaUpdateStatusBody, postController.patchStatus))
+router.patch('/:id', checkToken, postController.patchStatus)
 
 export default router

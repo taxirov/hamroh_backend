@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma, Role } from "@prisma/client"
 import prisma from "../prisma"
 
 const postSelect: Prisma.PostSelect = {
@@ -9,6 +9,7 @@ const postSelect: Prisma.PostSelect = {
             userId: true,
             userName: true,
             userPhone: true,
+            userRole: true,
             userEmail: true,
             userCarNumber: true,
             userCarType: true
@@ -64,8 +65,16 @@ export class PostService {
         let take: number = limit;
         return await prisma.post.findMany({ where: { status: { in: [1, 0] } }, orderBy: { createdAt: 'desc' }, select: postSelect, skip, take })
     }
+    async findAllByRole(role: string, page: number, limit: number) {
+        let skip: number = (page - 1) * limit;
+        let take: number = limit;
+        return await prisma.post.findMany({ where: { profile: { userRole: role as Role }}, orderBy: { createdAt: 'desc' }, select: postSelect, skip, take })
+    }
     async CountAll() {
         return (await prisma.post.findMany({ select: { id: true } })).length
+    }
+    async CountAllByRole(role: string) {
+        return (await prisma.post.findMany({ where: { profile: { userRole: role as Role } }, select: { id: true } })).length
     }
     async findAllActive(page: number, limit: number) {
         let skip: number = (page - 1) * limit;
@@ -77,51 +86,51 @@ export class PostService {
             skip, take
         })
     }
-    async findByFromLocation(fromLocation: string, page: number, limit: number) {
+    async findByFromLocation(fromLocation: string, role: string, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
         return await prisma.post.findMany({
-            where: { fromLocation },
+            where: { fromLocation: { startsWith: fromLocation }, profile: { userRole: role as Role } },
             orderBy: { createdAt: 'desc' },
             select: postSelect,
             skip, take
         })
     }
-    async CountByFromLocation(fromLocation: string) {
+    async CountByFromLocation(fromLocation: string, role: string) {
         return (await prisma.post.findMany({
-            where: { fromLocation },
+            where: { fromLocation: { startsWith: fromLocation }, profile: { userRole: role as Role } },
             select: { id: true },
         })).length
     }
-    async findByToLocation(toLocation: string, page: number, limit: number) {
+    async findByToLocation(toLocation: string, role: string, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
         return await prisma.post.findMany({
-            where: { toLocation },
+            where: { toLocation: { startsWith: toLocation }, profile: { userRole: role as Role } },
             orderBy: { createdAt: 'desc' },
             select: postSelect,
             skip, take
         })
     }
-    async CountByToLocation(toLocation: string) {
+    async CountByToLocation(toLocation: string, role: string) {
         return (await prisma.post.findMany({
-            where: { toLocation },
+            where: { toLocation: { startsWith: toLocation }, profile: { userRole: role as Role } },
             select: { id: true }
         })).length
     }
-    async findByDirection(fromLocation: string, toLocation: string, page: number, limit: number) {
+    async findByDirection(fromLocation: string, toLocation: string, role: string, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
         return await prisma.post.findMany({
-            where: { fromLocation, toLocation },
+            where: { fromLocation: { startsWith: fromLocation }, toLocation: { startsWith: toLocation }, profile: { userRole: role as Role } },
             select: postSelect,
             orderBy: { createdAt: 'desc' },
             skip, take
         })
     }
-    async CountByDirection(fromLocation: string, toLocation: string) {
+    async CountByDirection(fromLocation: string, toLocation: string, role: string) {
         return (await prisma.post.findMany({
-            where: { fromLocation, toLocation },
+            where: { fromLocation: { startsWith: fromLocation }, toLocation: { startsWith: toLocation }, profile: { userRole: role as Role} },
             select: { id: true }
         })).length
     }
@@ -135,15 +144,21 @@ export class PostService {
             skip, take
         })
     }
-    async findByUserId(userId: number, page: number, limit: number) {
+    async findByUserId(userId: number, status: number, page: number, limit: number) {
         let skip: number = (page - 1) * limit;
         let take: number = limit;
         return await prisma.post.findMany({
-            where: { profile: { userId} },
+            where: { profile: { userId }, status },
             select: postSelect,
             orderBy: { createdAt: 'desc' },
             skip, take
         })
+    }
+    async countByUserId(userId: number, status: number) {
+        return (await prisma.post.findMany({
+            where: { profile: { userId }, status },
+            select: { id: true }
+        })).length
     }
     async findById(id: number) {
         return await prisma.post.findUnique({

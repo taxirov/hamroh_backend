@@ -27,7 +27,7 @@ export async function getToken(req: Request, res: Response) {
         })
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         })
     }
 }
@@ -47,7 +47,7 @@ export async function getVerify(req: Request, res: Response) {
         }
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         })
     }
 }
@@ -93,7 +93,7 @@ export async function registerUser(req: Request, res: Response) {
         }
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         })
     }
 }
@@ -128,7 +128,7 @@ export async function loginUser(req: Request, res: Response) {
         }
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         })
     }
 }
@@ -144,7 +144,7 @@ export async function getUsers(req: Request, res: Response) {
         }
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         })
     }
 }
@@ -188,7 +188,7 @@ export async function resetUserPassword(req: Request, res: Response) {
         }
     } catch (e) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         });
     }
 }
@@ -212,7 +212,7 @@ export async function forgetUserPassword(req: Request, res: Response) {
         }
     } catch (error) {
         res.status(500).json({
-            error: 'Internal Server Error'
+            message: 'Internal Server Error'
         });
     }
 }
