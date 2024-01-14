@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 import { Request, Response } from "express"
 import { RegisterDto, LoginDto, Payload } from "../models/users.model"
 import { UserService } from "../services/users.service"
@@ -9,10 +12,10 @@ const userService = new UserService()
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'hamrohtaxi@gmail.com',
-      pass: 'Sevinch_9204   ',
+        user: process.env.GMAIL,
+        pass: process.env.GMAIL_PASSWORD,
     },
-  });
+});
 
 export async function getToken(req: Request, res: Response) {
     try {
@@ -139,7 +142,7 @@ export async function getUsers(req: Request, res: Response) {
         if (current_page != undefined && per_page != undefined) {
             const users = await userService.findAll(+current_page, +per_page)
             let u: number = await userService.findAllCount()
-            let p: number = u%+per_page == 0 ? Math.floor(u/+per_page) : Math.floor(u/+per_page) + 1
+            let p: number = u % +per_page == 0 ? Math.floor(u / +per_page) : Math.floor(u / +per_page) + 1
             res.status(200).json({ users, current_page, per_page, total_page_count: p, total_user_cout: u })
         }
     } catch (e) {
@@ -165,7 +168,7 @@ export async function patchUserStatus(req: Request, res: Response) {
             })
         }
     } catch (e) {
-        res.status(500).json({ message: "Internal server error"})
+        res.status(500).json({ message: "Internal server error" })
     }
 }
 
@@ -214,5 +217,48 @@ export async function forgetUserPassword(req: Request, res: Response) {
         res.status(500).json({
             message: 'Internal Server Error'
         });
+    }
+}
+export async function put(req: Request, res: Response) {
+    try {
+        const body: RegisterDto = req.body
+        const userExsistByPhone = await userService.findByPhone(body.phone)
+        if (userExsistByPhone) {
+            res.status(409).json({
+                message: body.phone + " bu raqamdan ro'yhatdan o'tishda foydalanilgan! Iltimos boshqa raqamdan foydalaning."
+            })
+        } else {
+            const userExsistByEmail = await userService.findByEmail(body.email)
+            if (userExsistByEmail) {
+                res.status(409).json({
+                    message: body.email + " bu emaildan ro'yhatdan o'tishda foydalanilgan! Iltimos boshqa emaildan foydalaning."
+                })
+            } else {
+                const user_dto: RegisterDto = {
+                    name: body.name,
+                    phone: body.phone,
+                    password: body.password,
+                    role: body.role,
+                    email: body.email,
+                    carNumber: body.carNumber,
+                    carType: body.carType
+                }
+                const user_created = await userService.create(user_dto)
+                const payload: Payload = {
+                    id: user_created.id,
+                    role: user_created.role
+                }
+                const access = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: process.env.ACCESS_EXPIRED })
+                const refresh = jwt.sign(payload, process.env.SECRET_KEY!, { expiresIn: process.env.REFRESH_EXPIRED })
+                res.status(200).json({
+                    user: user_created,
+                    access,
+                    refresh
+                })
+            }
+
+        }
+    } catch (e) {
+        res.status(500).json({ message: "Internal server error" })
     }
 }
